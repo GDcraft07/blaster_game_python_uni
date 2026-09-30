@@ -14,12 +14,17 @@ def main():
 
     ship = pygame.Rect((WIDTH - SHIP_WIDTH) // 2, HEIGHT - (SHIP_HEIGHT + 30), SHIP_WIDTH, SHIP_HEIGHT)
     asteroid = spawn_asteroid()
+    ballets = []
 
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                ballets += [pygame.Rect(ship.left, ship.top - BALLET_SIZE, BALLET_SIZE, BALLET_SIZE)]
+                ballets += [pygame.Rect(ship.right - BALLET_SIZE, ship.top - BALLET_SIZE, BALLET_SIZE, BALLET_SIZE)]
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
@@ -37,9 +42,16 @@ def main():
         if asteroid.top > HEIGHT:
             asteroid = spawn_asteroid()
 
+        for ballet in ballets:
+            ballet.y -= BALLET_SPEED
+        ballets = [ballet for ballet in ballets if ballet.bottom > 0]
+
         screen.fill(BLACK)
+
         pygame.draw.rect(screen, GRAY, ship)
         pygame.draw.rect(screen, RED, asteroid)
+        for ballet in ballets:
+            pygame.draw.rect(screen, GRAY, ballet)
         pygame.display.flip()
 
         clock.tick(FPS)
