@@ -4,7 +4,7 @@ from config import *
 
 
 def spawn_asteroid():
-    return pygame.Rect(random.randint(0, WIDTH - ASTEROID_SIZE), -ASTEROID_SIZE, ASTEROID_SIZE, ASTEROID_SIZE)
+    return {"hb": pygame.Rect(random.randint(0, WIDTH - ASTEROID_SIZE), -ASTEROID_SIZE, ASTEROID_SIZE, ASTEROID_SIZE), "speed": random.randint(ASTEROID_SPEED_MIN, ASTEROID_SPEED_MAX)}
 
 
 def main():
@@ -13,7 +13,8 @@ def main():
     clock = pygame.time.Clock()
 
     ship = pygame.Rect((WIDTH - SHIP_WIDTH) // 2, HEIGHT - (SHIP_HEIGHT + 30), SHIP_WIDTH, SHIP_HEIGHT)
-    asteroid = spawn_asteroid()
+    asteroids = []
+    next_spawn = 0
     ballets = []
 
     running = True
@@ -27,31 +28,53 @@ def main():
                 ballets += [pygame.Rect(ship.right - BALLET_SIZE, ship.top - BALLET_SIZE, BALLET_SIZE, BALLET_SIZE)]
 
         keys = pygame.key.get_pressed()
+
         if keys[pygame.K_LEFT]:
             ship.x -= SHIP_SPEED
+        
         if keys[pygame.K_RIGHT]:
             ship.x += SHIP_SPEED
 
         if ship.left < 0:
             ship.left = 0
+        
         if ship.right > WIDTH:
             ship.right = WIDTH
 
-        asteroid.y += ASTEROID_SPEED
+        now = pygame.time.get_ticks()
 
-        if asteroid.top > HEIGHT:
-            asteroid = spawn_asteroid()
+        if now >= next_spawn:
+            asteroids += [spawn_asteroid()]
+            next_spawn = now + random.randint(SPAWN_DELAY_MIN, SPAWN_DELAY_MAX)
+
+        for asteroid in asteroids:
+            asteroid["hb"].y += asteroid["speed"]
+        
+        asteroids = [asteroid for asteroid in asteroids if asteroid["hb"].top <= HEIGHT]
 
         for ballet in ballets:
             ballet.y -= BALLET_SPEED
+        
         ballets = [ballet for ballet in ballets if ballet.bottom > 0]
+
+        for ballet in ballets:
+            for asteroid in asteroids:
+                if ballet.colliderect(asteroid["hb"]):
+                    ballets.remove(ballet)
+                    asteroids.remove(asteroid)
+
+                    break
 
         screen.fill(BLACK)
 
         pygame.draw.rect(screen, GRAY, ship)
-        pygame.draw.rect(screen, RED, asteroid)
+
+        for asteroid in asteroids:
+            pygame.draw.rect(screen, RED, asteroid["hb"])
+
         for ballet in ballets:
             pygame.draw.rect(screen, GRAY, ballet)
+
         pygame.display.flip()
 
         clock.tick(FPS)
