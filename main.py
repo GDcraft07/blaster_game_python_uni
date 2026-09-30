@@ -1,5 +1,11 @@
+import random
 import pygame
 from config import *
+
+
+def spawn_asteroid():
+    return pygame.Rect(random.randint(0, WIDTH - ASTEROID_SIZE), -ASTEROID_SIZE, ASTEROID_SIZE, ASTEROID_SIZE)
+
 
 def main():
     pygame.init()
@@ -7,7 +13,8 @@ def main():
     clock = pygame.time.Clock()
 
     ship = pygame.Rect((WIDTH - SHIP_WIDTH) // 2, HEIGHT - (SHIP_HEIGHT + 30), SHIP_WIDTH, SHIP_HEIGHT)
-    
+    asteroid = spawn_asteroid()
+
     running = True
     while running:
         for event in pygame.event.get():
@@ -25,8 +32,14 @@ def main():
         if ship.right > WIDTH:
             ship.right = WIDTH
 
+        asteroid.y += ASTEROID_SPEED
+
+        if asteroid.top > HEIGHT:
+            asteroid = spawn_asteroid()
+
         screen.fill(BLACK)
         pygame.draw.rect(screen, GRAY, ship)
+        pygame.draw.rect(screen, RED, asteroid)
         pygame.display.flip()
 
         clock.tick(FPS)
