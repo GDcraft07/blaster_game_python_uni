@@ -4,11 +4,18 @@ from config import *
 
 
 def spawn_asteroid():
-    return {"hb": pygame.Rect(random.randint(0, WIDTH - ASTEROID_SIZE), -ASTEROID_SIZE, ASTEROID_SIZE, ASTEROID_SIZE), "speed": random.randint(ASTEROID_SPEED_MIN, ASTEROID_SPEED_MAX)}
+    if random.random() < STRONG_ASTEROID_CHANCE:
+        hp, color = (STRONG_ASTEROID_HP, DARK_RED)
+
+    else:
+        hp, color = (ASTEROID_HP, RED)
+
+    return {"hb": pygame.Rect(random.randint(0, WIDTH - ASTEROID_SIZE), -ASTEROID_SIZE, ASTEROID_SIZE, ASTEROID_SIZE), "speed": random.randint(ASTEROID_SPEED_MIN, ASTEROID_SPEED_MAX), "hp": hp, "color": color}
 
 
 def main():
     pygame.init()
+
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
 
@@ -61,16 +68,18 @@ def main():
             for asteroid in asteroids:
                 if ballet.colliderect(asteroid["hb"]):
                     ballets.remove(ballet)
-                    asteroids.remove(asteroid)
+                    asteroid["hp"] -= 1
 
                     break
+
+        asteroids = [asteroid for asteroid in asteroids if asteroid["hp"] > 0]
 
         screen.fill(BLACK)
 
         pygame.draw.rect(screen, GRAY, ship)
 
         for asteroid in asteroids:
-            pygame.draw.rect(screen, RED, asteroid["hb"])
+            pygame.draw.rect(screen, asteroid["color"], asteroid["hb"])
 
         for ballet in ballets:
             pygame.draw.rect(screen, GRAY, ballet)
