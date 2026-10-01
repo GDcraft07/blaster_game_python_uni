@@ -37,3 +37,8 @@ SCORE_HIT_SIMPLE = 6
 SCORE_HIT_STRONG = 30
 
 BEST_SCORE_PATH = os.path.join(os.path.dirname(__file__), "best_score.txt")
+
+LIVES = 3
+LIFE_SIZE = 16
+LIFE_GAP = 8
+BIG_FONT_SIZE = 60
