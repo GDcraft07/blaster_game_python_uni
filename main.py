@@ -77,13 +77,25 @@ def main():
                     ballets += [spawn_ballet(ship.right - BALLET_SIZE, ship.top - BALLET_SIZE)]
                     score -= SCORE_SHOT
 
+                if event.key == pygame.K_r and game_over:
+                    ship.x = (WIDTH - SHIP_WIDTH) // 2
+                    ship_x = float(ship.x)
+                    asteroids = []
+                    ballets = []
+                    next_spawn = 0
+                    score = 0
+                    lives = LIVES
+                    game_over = False
+
         if game_over:
             screen.fill(BLACK)
 
             title_text = big_font.render("Игра окончена", True, WHITE)
             result_text = font.render(f"Итоговый счёт: {score}", True, WHITE)
+            hint_text = font.render("R - начать заново", True, WHITE)
             screen.blit(title_text, ((WIDTH - title_text.get_width()) // 2, HEIGHT // 2 - 80))
             screen.blit(result_text, ((WIDTH - result_text.get_width()) // 2, HEIGHT // 2))
+            screen.blit(hint_text, ((WIDTH - hint_text.get_width()) // 2, HEIGHT // 2 + 50))
 
             pygame.display.flip()
             continue
