@@ -52,6 +52,8 @@ def main():
     next_spawn = 0
     ballets = []
 
+    stars = [{"x": random.randint(0, WIDTH - STAR_SIZE), "y": random.uniform(0, HEIGHT)} for _ in range(STAR_COUNT)]
+
     score = 0
     lives = LIVES
     game_over = False
@@ -116,6 +118,13 @@ def main():
 
         ship.x = int(ship_x)
 
+        for star in stars:
+            star["y"] += STAR_SPEED * dt
+
+            if star["y"] > HEIGHT:
+                star["x"] = random.randint(0, WIDTH - STAR_SIZE)
+                star["y"] = 0
+
         now = pygame.time.get_ticks()
 
         if now >= next_spawn:
@@ -163,6 +172,9 @@ def main():
             best_score = save_best_score(score, best_score)
 
         screen.fill(BLACK)
+
+        for star in stars:
+            pygame.draw.rect(screen, WHITE, (star["x"], int(star["y"]), STAR_SIZE, STAR_SIZE))
 
         pygame.draw.rect(screen, GRAY, ship)
 
